@@ -1,0 +1,293 @@
+:encoding: utf-8
+:lang: ja
+:scripts: cjk
+:media: prepress
+:linkcss:
+:stylesdir: css
+:stylesheet: mystyle.css
+:sectanchors:
+:autofit-option:
+:experimental:
+:support-uri:
+:original-support-uri:
+:twoinches: width='360'
+:full-width: width='100%'
+:three-quarters-width: width='75%'
+:two-thirds-width: width='66%'
+:half-width: width='50%'
+:half-size:
+:one-thirds-width: width='33%'
+:one-quarters-width: width='25%'
+:thumbnail: width='60'
+:imagesdir: images
+:sourcesdir: codes
+:icons: font
+:hide-uri-scheme!:
+:figure-caption: 図
+:example-caption: リスト
+:table-caption: 表
+:appendix-caption: 付録
+:xrefstyle: short
+:section-refsig:
+:chapter-refsig:
+
+
+= marker_reader
+
+NOTE: この演習は、各自が編集や実験に参加しつつ、グループで成果を作成します。
+
+* 追加したライドマーカー識別部に、ライドマーカーや周遊プランが識別できるか検討します。
+* カラーセンサーで色が識別できるか実験します。
+* カラーセンサーを使ったライドマーカー識別部をクラス図に追加し、ステートマシン図を修正します。
+
+== 準備
+
+. `sample04` のコードをディレクトリごと複製して `sample04_marker_reader` を用意しなさい。
+  * `sample04_marker_reader` は、`marker_reader` の `codes` の中に置きます（元の `sample04` のコードと同じ配置）。
+. `sample04.asta` を複製して、`sample04_marker_reader.asta` を用意しなさい
+  * `sample04_marker_reader.asta` は、`makrer_reader` の `models` の中に置きます（元の `sample04` のモデルと同じ配置）。
+. クラス図の名前を、 `sample04_marker_readerのクラス図` に変更しなさい。
+
+
+== やりたいこと
+
+. 徐行しながら、マーカーを見つけたら、読み込み、メッセージとしてLCDへ表示することを繰り返す。
+. マーカーグループを読み込んで、その順序どおりに表示する。
+
+== モデル図を修正する(1)
+
+
+=== sample04_marker_readerのクラス図を修正する
+
+. クラス図を参照して、`wall_detector` クラスや、`linemon` クラスを参考に、マーカーを識別するクラス `marker_reader` を作成しなさい。
+** 色を識別するのに、追加のカラーセンサーを使う。
+. 上記のクラスに、マーカーの色を識別する操作 `read` を用意しなさい。
+
+=== sample04_marker_readerのクラス図を保存しなさい
+
+作成したクラス図を `sample04_marker_reader_class_01.png` として `images` ディレクトリに保存しなさい。
+
+. 「ツール＞画像出力＞現在の図」で、保存用ダイアログを開く。
+. 作成したクラス図を `sample04_marker_reader_class_01.png` として `images` ディレクトリに保存する（ダミー画像ファイルになっているので、置き換える）
+
+.`sample04_marker_reader` のクラス図（保存できたら置き換わる）
+image::sample04_marker_reader_class_01.png[{full-width}]
+
+
+NOTE: 編集したら、ターミナルからgitコマンドを使ってコミットしなさい。
+
+
+== マーカー識別を実験する
+
+=== マーカーの識別に使う関数
+
+EV3RTインストールディレクトリに、EV3RTのC言語用APIのリファレンスがあるので、参考にするとよい。
+
+* `ev3rt-1.1-release/EV3RT_C_API_Reference/` の `index.html`
+
+.色を識別するからセンサーのAPI
+[source,c]
+----
+colorid_t ev3_color_sensor_get_color(sensor_port_t port);
+----
+
+.色のための型 `colorid_t`
+[source,c]
+----
+enum  colorid_t {
+  COLOR_NONE = 0,
+  COLOR_BLACK = 1,
+  COLOR_BLUE = 2,
+  COLOR_GREEN = 3,
+  COLOR_YELLOW = 4,
+  COLOR_RED = 5,
+  COLOR_WHITE = 6,
+  COLOR_BROWN = 7,
+  TNUM_COLOR
+}
+----
+
+=== LCDに表示するための関数
+
+util ディレクトリに、行番号を指定して文字列を表示する関数が用意してある。
+これらの関数を使うには、初期化の処理で `init_f` 関数を呼び出しておく。
+
+[source,c]
+.`util.c` に用意してある関数の例
+----
+/**
+ * 行単位で引数の文字列を表示
+ * @param str 表示する文字列
+ * @param line 20ドットごとの行番号（1から5）
+ */
+void msg_f(const char *str, int32_t line);
+
+/**
+ * 行単位で引数の数値を表示
+ * @param n 表示する数値
+ * @param line 20ドットごとの行番号（1から5）
+ */
+void num_f(const int n, int32_t line);
+----
+
+=== 色の名前をLCDに表示する
+
+
+色を名前の文字列に変換してLCDに表示しなさい。まだ、カラーセンサーは使わず、プログラム上で色の値を文字列として表示します。
+
+.  `sample04_marker_reader` のコードをディレクトリごと複製して `sample04_color_name_test` を用意しなさい。
+. 静的な文字列配列を用意し、`color_id_t` 型の値を添え字として色の名前を登録しなさい。
+. シートのタッチセンサーが押されるたびに、登録した配列の文字列を表示しなさい。
+** 実験用のコードはグループで考えて作成しなさい。
+. 上記を繰り返しなさい。
+
+NOTE: 実験したコードをコミットしておくこと。
+
+
+下記に、定義した文字列配列のコードを記載しなさい。ここにコードを切り貼りするのではなく、修正したコードそのものを参照するかたちをとること。
+
+[source,c,linenums]
+.`sample04_color_name_test/app.c` （の``colorid_t` の値を色の名前の文字列に変換する配列の部分）
+----
+include::{sourcesdir}/sample04_color_name_test/app.c[lines=1..27]
+----
+
+NOTE: `README.adoc` の上記部分を編集して、行範囲の指定（ `[lines=1..27]` の部分）を、自分達のコードに合うように修正する。
+
+
+=== マーカーを読んで、色の名前を表示する
+
+marker_readerのカラーセンサーでマーカーを読んで、マーカーの色の名前を表示しなさい。
+
+
+.マーカーを読んでいる様子
+image::marker_reader_reading_one.jpeg[width=50%]
+
+. 冒頭に複製した `sample04_marker_reader` を編集して実験しなさい。
+. `sample04_color_name_test` で作成した文字列配列を使いなさい。
+. マーカーを経路の脇の頃合いの場所において、経路に沿って走行している間にマーカーを通過したときにマーカーを読み、対応する文字列をLCDに表示しなさい。
+. マーカーの色を変えても動作することを確認しなさい。
+. 経路上の離れた複数の場所にいくつかの色のマーカーを置いて、それらを読みながら走行できるようにしなさい。
+
+
+
+下記に、マーカーの値を読み取ったら、色の名前を表示する部分のコードを示しなさい。
+ここにコードを切り貼りするのではなく、修正したコードそのものを参照するかたちをとること。
+
+NOTE: コードについては先にコミットしておくこと。
+
+[source,c,linenums]
+.`sample04_marker_reader/app.c` （のマーカーを調べて色が変わっていたら、文字列を表示する部分）
+----
+include::{sourcesdir}/sample04_marker_reader/app.c[lines=1..27]
+----
+
+NOTE: `README.adoc` の上記部分を編集して、行範囲の指定（ `[lines=1..27]` の部分）を、自分達のコードに合うように修正する。
+
+
+== 周遊プランを読んで表示する
+
+=== 周遊プランを読む初期プログラムを実験する
+
+
+marker_readerのカラーセンサーで周遊プラン（マーカーの並び）を読んで、マーカーの色の名前を表示しなさい。
+
+.周遊プランを読んでいる様子
+image::marker_reader_reading_multi.jpeg[width=50%]
+
+. 先の演習で使った `sample04_marker_reader` を複製して、`sample04_plan_reader` を用意しなさい。
+**  `sample04_marker_reader` ではなく、別のコードから始めてもよい。
+. 経路に沿って走行しながら、マーカーの並びを読んで変数に保存しなさい。
+. マーカー並びを読み終わったら、停止して、マーカーの並びから周遊プランを表示しなさい。
+
+NOTE: 実験の目的が、逐次表示するのはなく、読み込んだマーカーの並びを覚えることにあるのに注意すること。
+
+=== 周遊プランを読むときの課題を検討する
+
+周遊プランを読むときに問題があれば挙げなさい。そして、このファイル（ `README.adoc` ）を編集して、その問題を下記に列挙しなさい。
+
+.周遊プランを読むときに発見した課題
+* ここに課題を列挙する。
+* ここに課題を列挙する。
+* ここに課題を列挙する。
+
+==== 周遊プランを読むときの課題の対応策を考える
+
+課題の対応策を検討し、どのような対応策を取ればよいかアイディアを出しなさい（できそうかどうかで峻別せずに、いろいろなアイディアを出す）。
+そして、このファイル（ `README.adoc` ）を編集して、そのアイディアを下記に列挙しなさい。
+
+.周遊プランを読むときの課題の対応策のアイディア
+* ここにアイディアを列挙する。
+* ここにアイディアを列挙する。
+* ここにアイディアを列挙する。
+
+
+==== 周遊プランを読むときの最終案を実現する
+
+最終的に採用したアイディアに基づいて対応策を決め、その方法について説明しなさい。
+そして、このファイル（ `README.adoc` ）を編集して、そのアイディアを下記に列挙しなさい。
+
+.周遊プランを読むときの対応策の最終案の説明
+* ここに最終案について説明する。
+* ここに最終案について説明する。
+* ここに最終案について説明する。
+
+
+下記に、周遊プランを読む際の、マーカーの並びを覚えるところや、周遊プランを表示する部分のコードを示しなさい。
+ここにコードを切り貼りするのではなく、修正したコードそのものを参照するかたちをとること。
+
+NOTE: コードについては先にコミットしておくこと。
+
+[source,c,linenums]
+.`sample04_plan_reader/app.c` (1) （のマーカーの並びを覚える部分）
+----
+include::{sourcesdir}/sample04_plan_reader/app.c[lines=1..27]
+----
+
+NOTE: `README.adoc` の上記部分を編集して、行範囲の指定（ `[lines=1..27]` の部分）を、自分達のコードに合うように修正する。
+
+
+[source,c,linenums[]
+.`sample04_plan_reader/app.c` (2) （の周遊プランを表示する部分）
+----
+include::{sourcesdir}/sample04_plan_reader/app.c[lines=1..27]
+----
+
+NOTE: `README.adoc` の上記部分を編集して、行範囲の指定（ `[lines=1..27]` の部分）を、自分達のコードに合うように修正する。
+
+
+== モデル図を修正する(2)
+
+
+=== sample04_plan_readerのクラス図を修正する
+
+. `models` ディレクトリに `sample04_plan_reader.asta` を要していない場合は、 `sample04_marker_reader.asta` 等以前のモデルファイルを複製して、モデルファイルを準備しなさい。
+. クラス図の名前を 「sample04_plan_readerのクラス図」 に変更しなさい。
+. クラス図を編集して、マーカーを識別するクラス `marker_reader` を使った、 `plan_reader` クラスを作成しなさい。
+** マーカーを読むのには、`marker_reader` を使う。
+. 上記のクラスに、周遊プランを読み込む操作 `read` を用意しなさい。
+
+
+=== plan_readerクラスのステートマシン図を作成する
+
+. astah* の構造ツリーから `plan_reader` クラスを選択した状態で右クリックし、「図の追加」で「ステートマシン図を追加しなさい。
+** 追加したステートマシン図の名前を「plan_readerクラスのステートマシン図」に変更しなさい。
+. 実験で得た周遊プランの読み込み処理を参考に、ステートマシン図を使って `plan_reader` クラスの操作 `read` のステートマシン図を作成しなさい。
+
+
+=== sample04_plan_readerのモデル図を保存しなさい
+
+* 作成したクラス図を `sample04_plan_reader_class_01.png` として `images` ディレクトリに保存しなさい。
+* 作成したステートマシン図を `sample04_plan_reader_stm_01.png` として `images` ディレクトリに保存しなさい。
+
+.`sample04_plan_reader` のクラス図（保存できたら置き換わる）
+image::sample04_plan_reader_class_01.png[{full-width}]
+
+
+.`sample04_plan_reader` の（`read` の）ステートマシン図（保存できたら置き換わる）
+image::sample04_plan_reader_stm_01.png[{full-width}]
+
+
+NOTE: 編集したら、ターミナルからgitコマンドを使ってコミットしなさい。
+
+NOTE: コミットが済んだら、プッシュしなさい。
